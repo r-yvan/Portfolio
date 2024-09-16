@@ -4,17 +4,18 @@ import v2 from "../assets/v-2.png";
 import v3 from "../assets/v-3.png";
 import v4 from "../assets/v-4.png";
 import v5 from "../assets/v-5.png";
-import background from "../assets/BackgroundImage.png";
 import profile from "../assets/anotherMe.png";
-import netflixLogo from "../assets/netflix.png";
-import googleLogo from "../assets/google.png";
-import paypalLogo from "../assets/paypal.png";
-import skypeLogo from "../assets/skype.png";
-import amazonLogo from "../assets/amazon.png";
 import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { motion, useScroll, useTransform, useAnimation } from "framer-motion";
-import { IconBrandLinkedin } from "@tabler/icons-react";
+import {
+  IconBrandFacebook,
+  IconBrandInstagram,
+  IconBrandLinkedin,
+  IconBrandSupabase,
+  IconBrush,
+  IconCrown,
+} from "@tabler/icons-react";
 
 const Header = () => {
   const controls = useAnimation();
@@ -81,7 +82,7 @@ const Header = () => {
                   Dolorem totam adipisci dolor? Laboriosam eligendi vel dolorum,
                   fuga non pariatur quae?
                 </p>
-                <button className="font-bold text-green-400 border border-green-400 w-fit px-10 py-3 rounded-2xl">
+                <button className="font-bold text-green-400 border-2 border-green-400 w-fit px-10 py-3 rounded-2xl">
                   Contact Me
                 </button>
               </div>
@@ -90,17 +91,17 @@ const Header = () => {
                   <p className="font-bold">My Social Media</p>
                 </div>
                 <div className="flex flex-row">
-                  <div className="pr-3 border-r border-green-400">
-                    <div className="p-3 bg-[#2a303a] rounded-full w-fit">
-                      <IconBrandLinkedin size={32} />
-                    </div>
+                  <div className="flex flex-row gap-1 pr-3 border-r-2 border-green-400">
+                    <IconBrandLinkedin size={24} color="#4ade80" />
                     <p className="font-bold">LinkedIn</p>
                   </div>
-                  <div className="px-3 border-r border-green-400">
-                    <p>Facebook</p>
+                  <div className="flex flex-row gap-1 px-3 border-r-2 border-green-400">
+                    <IconBrandFacebook size={24} color="#4ade80" />
+                    <p className="font-bold">Facebook</p>
                   </div>
-                  <div className="px-3">
-                    <p>Instagram</p>
+                  <div className="flex flex-row gap-1 px-3">
+                    <IconBrandInstagram size={24} color="#4ade80" />
+                    <p className="font-bold">Instagram</p>
                   </div>
                 </div>
               </div>
@@ -123,11 +124,6 @@ const Header = () => {
               alt=""
               className="absolute left-[60px] top-[250px] w-14 rotate-[5deg] h-[70px]"
             />
-            <img
-              src={v3}
-              alt=""
-              className="absolute left-[170px] rotate-[3deg] top-[590px] w-48 h-auto"
-            />
             <div className="flex flex-col gap-40 w-1/3">
               <div className="flex flex-col gap-10">
                 <div>
@@ -137,32 +133,36 @@ const Header = () => {
                   <p className="font-bold text-5xl">Frontend Developer</p>
                 </div>
                 <div>
-                  <p className="w-4/5 opacity-80">
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                    Commodi accusamus aut aliquid exercitationem in, minus neque
-                    architecto omnis totam pariatur repellat amet aliquam.
-                    Aperiam nesciunt obcaecati non.
+                  <p className="w-4/5 opacity-80 tracking-tight">
+                    I'm a passionate frontend developer based in Kigali, Rwanda,
+                    with a strong foundation in building dynamic and responsive
+                    web applications. My expertise lies in leveraging modern
+                    JavaScript frameworks and tools to create seamless user
+                    experiences
                   </p>
                 </div>
-                <div>
+                <div className="flex flex-col gap-3">
                   <div className="px-3 py-2 bg-[#202020] w-fit rounded-xl">
                     <p className="font-bold">Discover my</p>
                   </div>
                   <div className="flex flex-row">
-                    <div className="px-3 border-r border-green-400">
-                      <p>Skills</p>
+                    <div className="flex flex-row gap-1 pr-5 border-r-2 border-green-400">
+                      <IconBrandSupabase size={24} color="#4ade80" />
+                      <p className="font-bold">Skills</p>
                     </div>
-                    <div className="px-3 border-r border-green-400">
-                      <p>Art</p>
+                    <div className="flex flex-row gap-1 px-5 border-r-2 border-green-400">
+                      <IconBrush size={24} color="#4ade80" />
+                      <p className="font-bold">Art</p>
                     </div>
-                    <div className="px-3">
-                      <p>Experience</p>
+                    <div className="flex flex-row gap-1 px-5">
+                      <IconCrown size={24} color="#4ade80" />
+                      <p className="font-bold">Experience</p>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="w-4/5 pl-5 border-l border-green-400 ml-32">
-                <p>
+              <div className="w-4/5 pl-5 border-l-2 border-green-400 ml-32">
+                <p className="opacity-80">
                   Lorem ipsum dolor, sit amet consectetur adipisicing elit.
                   Fugiat similique quod, cum repudiandae quisquam laborum eaque
                   modi architecto at vel beatae. Non deserunt laudantium
