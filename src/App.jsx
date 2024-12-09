@@ -12,12 +12,12 @@ const App = () => {
   return (
     <div className="overflow-x-hidden font-body">
       <Header />
-      {/* <About />
+      <About />
       <Education />
       <Skills />
       <Projects />
       <Clients />
-      <Contact /> */}
+      <Contact />
     </div>
   );
 };

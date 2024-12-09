@@ -54,40 +54,43 @@ const Header = () => {
       </div>
       <div className="spotlight" ref={ref} animate={controls}>
         <div className="flex flex-col relative px-4 pt-10 pb-10 z-10">
-          <div className="flex flex-row justify-center gap-10 mt-20">
-            <div className="w-96 h-96"></div>
-            <div className="w-96 h-96"></div>
-            <div className="w-96 h-96"></div>
-            <div className="grid grid-cols-[35px_35px_35px_35px_35px_35px_35px_35px_35px_35px_35px] grid-rows-[35px_35px_35px_35px_35px_35px_35px_35px_35px_35px_35px] z-20">
-              <div className="w-72 h-72 bg-green-400 rounded-2xl row-start-1 col-start-3"></div>
-              <div className="w-72 h-72 border-white border-4 rounded-2xl ml-5 mt-5"></div>
-              <div className="w-[300px] h-[300px] col-start-2 row-start-2 overflow-hidden rounded-3xl z-20 duration-1000 ease-out">
-                <img className="" src={profile} alt="Rubuto Yvan" />
+          <div className="w-full flex justify-between px-10">
+            <div className="w-1/3 gap-2">
+              <div className="px-3 py-2 bg-[#202020] w-fit rounded-xl">
+                <p className="font-bold">Hello There, I' m</p>
               </div>
-            </div>
-            <div className="pb-14">
-              <h5 className="text-2xl font-bold">
-                <a href="https://git.io/typing-svg">
-                  <img
-                    src="https://readme-typing-svg.herokuapp.com?font=Poppins&weight=700&size=40&duration=4000&pause=1000&color=FFFFFF&width=1000&height=100&lines=Hello+There+I'm+Rubuto+Yvan;I'+m+a+FullStack+Developer"
-                    alt="Typing SVG"
-                  />
-                </a>
-              </h5>
-              <h1 className="w-full py-6 text-5xl text-green-400 font-bold">
-                Full Stack Developer
-              </h1>
-              <p className="text-gray-300 mt-4 text-md font-light">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                Maecenas tincidunt felis nec augue vestibulum, sit amet cursus
-                sapien feugiat. Curabitur sagittis convallis nisl, vel accumsan
-                eros tincidunt in. Donec sodales, metus ac varius lobortis,
-                lacus lorem volutpat urna, sed viverra arcu odio in justo.
+              <div>
+                <p className="font-bold">Rubuto</p>
+                <p className="font-bold text-green-400">Yvan</p>
+              </div>
+              <p className="">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorem
+                totam adipisci dolor? Laboriosam eligendi vel dolorum, fuga non
+                pariatur quae?
               </p>
+              <button>Contact Me</button>
+              <div>
+                <p>My Social Media</p>
+              </div>
+              <div></div>
+              <div></div>
             </div>
-            <div className="w-96 h-96"></div>
-            <div className="w-96 h-96"></div>
-            <div className="w-96 h-96"></div>
+            <div className="w-1/3">
+              <div>
+                <p>UI/UX Designer</p>
+                <p>Frontend Developer</p>
+                <p>
+                  Lorem, ipsum dolor sit amet consectetur adipisicing elit.
+                  Commodi accusamus aut aliquid exercitationem in, minus neque
+                  architecto omnis totam pariatur repellat amet aliquam. Aperiam
+                  nesciunt obcaecati non. Asperiores veniam omnis vel, officiis
+                  similique suscipit, ducimus pariatur praesentium totam quis
+                  dolores?
+                </p>
+                <div></div>
+              </div>
+              <div></div>
+            </div>
           </div>
           <div className="flex justify-center items-center flex-wrap gap-8 falling-text">
             <img src={netflixLogo} alt="Netflix" className="h-8" />
