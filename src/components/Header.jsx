@@ -53,51 +53,80 @@ const Header = () => {
         </nav>
       </div>
       <div className="spotlight" ref={ref} animate={controls}>
-        <div className="flex flex-col relative px-4 pt-10 pb-10 z-10">
-          <div className="w-full flex justify-between px-10">
+        <div className="flex flex-col relative px-4 py-40 pb-96 z-10">
+          <div className="w-full flex justify-between px-28">
             <div className="w-1/3 gap-2">
               <div className="px-3 py-2 bg-[#202020] w-fit rounded-xl">
                 <p className="font-bold">Hello There, I' m</p>
               </div>
               <div>
-                <p className="font-bold">Rubuto</p>
-                <p className="font-bold text-green-400">Yvan</p>
+                <p className="font-bold text-3xl">Rubuto</p>
+                <p className="font-bold text-green-400 text-2xl">Yvan</p>
               </div>
-              <p className="">
+              <p className="w-2/3">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorem
                 totam adipisci dolor? Laboriosam eligendi vel dolorum, fuga non
                 pariatur quae?
               </p>
-              <button>Contact Me</button>
-              <div>
-                <p>My Social Media</p>
+              <button className="font-bold text-green-400 border border-green-400 px-10 py-3 rounded-2xl">
+                Contact Me
+              </button>
+              <div className="px-3 py-2 bg-[#202020] w-fit rounded-xl">
+                <p className="font-bold">My Social Media</p>
               </div>
               <div></div>
-              <div></div>
+              <div className="flex flex-row">
+                <div className="px-3 border-r border-green-400">
+                  <p>LinkedIn</p>
+                </div>
+                <div className="px-3 border-r border-green-400">
+                  <p>Facebook</p>
+                </div>
+                <div className="px-3">
+                  <p>Instagram</p>
+                </div>
+              </div>
             </div>
+            <div className="w-[500px] h-[500px] absolute right-[42%] top-[40] rounded-full bg-green-400"></div>
+            <img
+              src={profile}
+              alt=""
+              className="w-[500px] absolute h-auto top-54 right-[42%]"
+            />
             <div className="w-1/3">
-              <div>
-                <p>UI/UX Designer</p>
-                <p>Frontend Developer</p>
-                <p>
-                  Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                  Commodi accusamus aut aliquid exercitationem in, minus neque
-                  architecto omnis totam pariatur repellat amet aliquam. Aperiam
-                  nesciunt obcaecati non. Asperiores veniam omnis vel, officiis
-                  similique suscipit, ducimus pariatur praesentium totam quis
-                  dolores?
-                </p>
-                <div></div>
+              <div className="flex flex-col gap-6">
+                <div>
+                  <p className="font-bold text-green-400 text-3xl">
+                    UI/UX Designer,{" "}
+                  </p>
+                  <p className="font-bold text-5xl">Frontend Developer</p>
+                </div>
+                <div>
+                  <p className="w-4/5 opacity-80">
+                    Lorem, ipsum dolor sit amet consectetur adipisicing elit.
+                    Commodi accusamus aut aliquid exercitationem in, minus neque
+                    architecto omnis totam pariatur repellat amet aliquam.
+                    Aperiam nesciunt obcaecati non.
+                  </p>
+                </div>
+                <div>
+                  <div className="px-3 py-2 bg-[#202020] w-fit rounded-xl">
+                    <p className="font-bold">Discover my</p>
+                  </div>
+                  <div className="flex flex-row">
+                    <div className="px-3 border-r border-green-400">
+                      <p>Skills</p>
+                    </div>
+                    <div className="px-3 border-r border-green-400">
+                      <p>Art</p>
+                    </div>
+                    <div className="px-3">
+                      <p>Experience</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div></div>
             </div>
-          </div>
-          <div className="flex justify-center items-center flex-wrap gap-8 falling-text">
-            <img src={netflixLogo} alt="Netflix" className="h-8" />
-            <img src={googleLogo} alt="Google" className="h-8" />
-            <img src={paypalLogo} alt="PayPal" className="h-8" />
-            <img src={skypeLogo} alt="Skype" className="h-8" />
-            <img src={amazonLogo} alt="Amazon" className="h-8" />
           </div>
         </div>
         <div className="flex flex-row justify-center gap-5 falling-text">
