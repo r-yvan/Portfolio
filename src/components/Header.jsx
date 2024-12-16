@@ -14,6 +14,7 @@ import amazonLogo from "../assets/amazon.png";
 import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { motion, useScroll, useTransform, useAnimation } from "framer-motion";
+import { IconBrandLinkedin } from "@tabler/icons-react";
 
 const Header = () => {
   const controls = useAnimation();
@@ -66,8 +67,12 @@ const Header = () => {
                   <p className="font-bold">Hello There, I' m</p>
                 </div>
                 <div>
-                  <p className="font-bold text-3xl">Rubuto</p>
-                  <p className="font-bold text-green-400 text-2xl">Yvan</p>
+                  <p className="font-bold text-2xl leading-none tracking-tighter">
+                    Rubuto{" "}
+                    <span className="font-bold text-green-400 tracking-tighter text-3xl">
+                      Yvan<span className="text-4xl text-white">.</span>
+                    </span>
+                  </p>
                 </div>
               </div>
               <div className="flex flex-col gap-3">
@@ -80,13 +85,16 @@ const Header = () => {
                   Contact Me
                 </button>
               </div>
-              <div>
+              <div className="flex flex-col gap-4">
                 <div className="px-3 py-2 bg-[#202020] w-fit rounded-xl">
                   <p className="font-bold">My Social Media</p>
                 </div>
                 <div className="flex flex-row">
-                  <div className="px-3 border-r border-green-400">
-                    <p>LinkedIn</p>
+                  <div className="pr-3 border-r border-green-400">
+                    <div className="p-3 bg-[#2a303a] rounded-full w-fit">
+                      <IconBrandLinkedin size={32} />
+                    </div>
+                    <p className="font-bold">LinkedIn</p>
                   </div>
                   <div className="px-3 border-r border-green-400">
                     <p>Facebook</p>
