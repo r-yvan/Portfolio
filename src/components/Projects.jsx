@@ -8,7 +8,7 @@ const Projects = () => {
     {
       img: {},
       title: "DoBuddy",
-      description: "Simple mobile app to increase your productivity..",
+      description: "Simple mobile app to track your daily activities ot tasks for your productivity improvement..",
       link: "do-buddy.vercel.app",
     },
     {
@@ -37,7 +37,28 @@ const Projects = () => {
       title: "NoviumTech",
       description:
         "Website that provide real time information about the outside trending tech gadgets..",
-      link: "",
+      link: "novium-tech.vercel.app",
+    },
+    {
+      img: {},
+      title: "PlanHub",
+      description:
+        "Website that provide real time information about the outside trending tech gadgets..",
+      link: "novium-tech.vercel.app",
+    },
+    {
+      img: {},
+      title: "Chatten",
+      description:
+        "Website that provide real time information about the outside trending tech gadgets..",
+      link: "novium-tech.vercel.app",
+    },
+    {
+      img: {},
+      title: "DoneWithIt",
+      description:
+        "Website that provide real time information about the outside trending tech gadgets..",
+      link: "novium-tech.vercel.app",
     },
   ];
 
@@ -58,7 +79,7 @@ const Projects = () => {
               <div className="w-full rounded-t-xl overflow-hidden mb-2">
                 <img src={temp} alt="" />
               </div>
-              <div className="flex flex-col h-28 pr-2 pl-2 before:contents-[''] before:absolute before:w-1 before:h-28 before:bg-green-400 before:rounded-full">
+              <div className="flex flex-col h-28 pr-2 pl-2 before:contents-[''] before:absolute before:w-1 before:h-28 before:bg-green-500 before:rounded-full">
                 <h3 className="pl-3 text-lg font-semibold mb-2">
                   {project.title}
                 </h3>
