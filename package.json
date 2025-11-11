@@ -12,6 +12,7 @@
   "dependencies": {
     "@tabler/icons-react": "^3.31.0",
     "axios": "^1.12.2",
+    "caniuse-lite": "^1.0.30001754",
     "framer-motion": "^11.12.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
