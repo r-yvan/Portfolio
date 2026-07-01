@@ -1,0 +1,281 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   DISPLAY FONT — Lay Grotesk (self-hosted, woff2)
+   Free foundry-trial subset (A–Z a–z 0–9 ! , . ?). Space Grotesk is
+   the complete fallback for every other glyph + all body/UI text, so
+   missing characters render seamlessly in the same grotesk voice.
+   ============================================================ */
+@font-face {
+  font-family: "Lay Grotesk";
+  src: url("/fonts/lay-medium.woff2") format("woff2");
+  font-weight: 300 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lay Grotesk";
+  src: url("/fonts/lay-semibold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lay Grotesk";
+  src: url("/fonts/lay-black.woff2") format("woff2");
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
+  --ink-950: #050505;
+  --ink-900: #0a0a0a;
+  --ink-850: #0d0d0d;
+
+  --ash-900: #1a1a1a;
+  --ash-700: #3d3d3d;
+  --ash-500: #6b6b6b;
+  --ash-400: #a0a0a0;
+
+  --iris-300: #c4b5fd;
+  --iris-400: #a78bfa;
+  --iris-500: #8b5cf6;
+  --iris-600: #7b5ea7;
+  --iris-700: #6d28d9;
+
+  --grid: rgba(255, 255, 255, 0.038);
+  --grid-size: 64px;
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+@layer base {
+  * {
+    @apply border-white/5;
+  }
+
+  html {
+    background-color: var(--ink-950);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-ink-950 font-body text-ash-100/90 antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Lay Grotesk is geometric — pull the display tracking tight for
+     the stunning, condensed editorial headlines. */
+  .font-display {
+    letter-spacing: -0.03em;
+  }
+
+  /* Inverted accent: every serif-italic accent word reads blueviolet,
+     overriding whatever text color the markup sets. */
+  .font-serif.italic {
+    color: var(--iris-400);
+  }
+
+  ::selection {
+    background: var(--iris-500);
+    color: #fff;
+  }
+
+  /* Thin violet scrollbar */
+  ::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--ink-950);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(var(--iris-700), var(--iris-500));
+    border-radius: 999px;
+    border: 2px solid var(--ink-950);
+  }
+
+  /* Hide native cursor on devices that support the custom one */
+  @media (hover: hover) and (pointer: fine) {
+
+    body.has-custom-cursor,
+    body.has-custom-cursor * {
+      cursor: none;
+    }
+  }
+}
+
+/* ============================================================
+   COMPONENT UTILITIES
+   ============================================================ */
+@layer components {
+
+  /* Glassmorphism card used on public site + admin */
+  .glass {
+    @apply border border-white/10 bg-white/[0.03] backdrop-blur-xl;
+  }
+
+  .glass-strong {
+    @apply border border-white/10 bg-white/[0.05] backdrop-blur-2xl;
+  }
+
+  /* Monospace section label e.g. [02] SELECTED WORK / 2024 — 2026 */
+  .section-label {
+    @apply inline-flex items-center gap-2 font-mono text-[0.7rem] uppercase tracking-[0.32em] text-ash-500;
+  }
+
+  /* Bordered monospace tech pill (wibify reference) */
+  .tag {
+    @apply inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.02] px-2.5 py-1 font-mono text-[0.68rem] uppercase tracking-wider text-ash-400 transition-colors duration-300;
+  }
+
+  .tag:hover {
+    @apply border-iris-500/50 text-iris-300;
+  }
+
+  /* Giant ghost outline numerals (wibify reference) */
+  .ghost-number {
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.12);
+    color: transparent;
+    @apply font-display font-bold leading-none;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-br from-white via-ash-100 to-ash-400 bg-clip-text text-transparent;
+  }
+
+  .text-iris-gradient {
+    @apply bg-gradient-to-br from-iris-300 via-iris-400 to-iris-600 bg-clip-text text-transparent;
+  }
+}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+@layer utilities {
+
+  /* Fluid type helpers */
+  .text-display {
+    font-size: clamp(2.75rem, 9vw, 9rem);
+    line-height: 0.92;
+    letter-spacing: -0.04em;
+  }
+
+  .text-section-title {
+    font-size: clamp(2rem, 5.5vw, 4.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+  }
+
+  /* Continuous blueprint grid layer */
+  .blueprint-grid {
+    background-image: var(--tw-bg-grid, none),
+      linear-gradient(to right, var(--grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+    background-size: var(--grid-size) var(--grid-size);
+  }
+
+  /* Fade the grid out toward the viewport edges */
+  .mask-radial {
+    -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 40%,
+        #000 30%,
+        transparent 100%);
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 40%,
+        #000 30%,
+        transparent 100%);
+  }
+
+  .mask-fade-y {
+    -webkit-mask-image: linear-gradient(to bottom,
+        transparent,
+        #000 12%,
+        #000 88%,
+        transparent);
+    mask-image: linear-gradient(to bottom,
+        transparent,
+        #000 12%,
+        #000 88%,
+        transparent);
+  }
+
+  .mask-fade-x {
+    -webkit-mask-image: linear-gradient(to right,
+        transparent,
+        #000 8%,
+        #000 92%,
+        transparent);
+    mask-image: linear-gradient(to right,
+        transparent,
+        #000 8%,
+        #000 92%,
+        transparent);
+  }
+
+  /* Film grain overlay */
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   LENIS SMOOTH SCROLL
+   ============================================================ */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
