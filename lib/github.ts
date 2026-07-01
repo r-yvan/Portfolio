@@ -16,6 +16,7 @@ export type Project = {
   updatedAt: string;
   category: ProjectCategory;
   featured: boolean;
+  image: string | null;
 };
 
 type GitHubRepo = {
@@ -75,6 +76,7 @@ const FALLBACK: Project[] = [
     updatedAt: new Date().toISOString(),
     category: "Web",
     featured: true,
+    image: null,
   },
 ];
 
@@ -116,6 +118,7 @@ export async function getProjects(): Promise<Project[]> {
         updatedAt: r.updated_at,
         category: categorize(r),
         featured: false,
+        image: null,
       }))
       .sort(
         (a, b) =>

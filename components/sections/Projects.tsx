@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import {
   AnimatePresence,
   motion,
@@ -12,6 +13,7 @@ import {
   ExternalLink,
   GitFork,
   Github,
+  Image as ImageIcon,
   Star,
 } from "lucide-react";
 import { SectionLabel } from "@/components/ui/SectionLabel";
@@ -66,6 +68,29 @@ function ProjectCard({ project }: { project: Project }) {
       transition={{ duration: 0.5, ease: EASE }}
       className="group glass relative flex flex-col rounded-2xl p-6 transition-colors duration-300 hover:border-white/20 hover:shadow-card [transform-style:preserve-3d]"
     >
+      <div className="relative mb-5 aspect-[16/10] overflow-hidden rounded-xl border border-white/[0.06] bg-ink-900/70 [transform:translateZ(20px)]">
+        {project.image ? (
+          <Image
+            src={project.image}
+            alt={project.title}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+          />
+        ) : (
+          <>
+            <div className="blueprint-grid absolute inset-0 opacity-60" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <ImageIcon
+                size={22}
+                strokeWidth={1.5}
+                className="text-ash-700 transition-colors duration-500 group-hover:text-ash-500"
+              />
+            </div>
+          </>
+        )}
+      </div>
+
       <div className="flex items-center justify-between">
         <span className="tag">
           {project.featured && (
