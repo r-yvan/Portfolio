@@ -1,20 +1,20 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-16T00:00:00.000Z",
+  "updatedAt": "2026-11-16T19:40:34.155Z",
   "profile": {
     "firstName": "Yvan",
     "lastName": "Rubuto",
-    "fullName": "Yvan Kiliye Rubuto",
+    "fullName": "Yvan NKILIYE Rubuto",
     "displayName": "Rubuto Yvan",
     "initials": "RY",
     "title": "Software Engineer & Designer",
     "roles": [
-      "Software engineer",
-      "Full-stack developer",
-      "UI/UX designer",
-      "Builder of beautiful things"
+      "Software Engineer",
+      "Full-Stack Developer",
+      "UI/UX Designer",
+      "Builder of Beautiful Things"
     ],
-    "headline": "I build *digital experiences* for _ambitious ideas._",
+    "headline": "Building *Digital Experiences* for _Ambitious Ideas._",
     "tagline": "I build digital experiences at the intersection of engineering precision and visual obsession.",
     "bio": [
       "I'm a software engineer and designer based in Kigali, Rwanda, obsessed with the space where rigorous engineering meets cinematic design.",
@@ -78,17 +78,17 @@
   ],
   "principles": [
     {
-      "label": "Fig 0.1 — Foundation",
+      "label": "Foundation",
       "title": "Engineered to last.",
       "body": "Clean, typed foundations and tested architecture — so the work keeps scaling long after launch day."
     },
     {
-      "label": "Fig 0.2 — Intent",
+      "label": "Intent",
       "title": "Designed with intent.",
       "body": "Structure, hierarchy and motion composed as one deliberate system — never decoration for its own sake."
     },
     {
-      "label": "Fig 0.3 — Momentum",
+      "label": "Momentum",
       "title": "Built for speed.",
       "body": "Performance is a feature: fast loads, fluid interaction and real momentum on every device."
     }
