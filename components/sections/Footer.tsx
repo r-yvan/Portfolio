@@ -115,7 +115,17 @@ export function Footer({ profile, socials, nav }: { profile: Profile; socials: S
           <span className="label">
             © {year} {profile.fullName}
           </span>
-          <span className="label">Next.js · Three.js · Framer Motion</span>
+          <span className="label">
+            Next.js · Three.js · Framer Motion · Map data ©{" "}
+            <a
+              href="https://www.openstreetmap.org/copyright"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-colors hover:text-accent"
+            >
+              OpenStreetMap contributors
+            </a>
+          </span>
         </div>
       </div>
     </footer>

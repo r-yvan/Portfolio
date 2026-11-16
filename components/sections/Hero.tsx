@@ -3,11 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import { ArrowDown, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { useScrollTo } from "@/components/providers/SmoothScroll";
 import { Counter } from "@/components/ui/Counter";
 import { Crosshairs } from "@/components/ui/Crosshairs";
-import { LocalTime } from "@/components/ui/LocalTime";
 import { Magnetic } from "@/components/ui/Magnetic";
 import { RichHeading } from "@/components/ui/RichHeading";
 import { Scramble } from "@/components/ui/Scramble";
@@ -35,33 +34,19 @@ const STAT_COLS: Record<number, string> = {
   4: "grid-cols-2 sm:grid-cols-4",
 };
 
-function formatCoord(value: number, pos: string, neg: string) {
-  return `${Math.abs(value).toFixed(4)}° ${value >= 0 ? pos : neg}`;
-}
-
 export function Hero({ profile, stats }: { profile: Profile; stats: Stat[] }) {
   const scrollTo = useScrollTo();
   const sectionRef = useRef<HTMLElement>(null);
   const active = useSceneActive(sectionRef);
   const palette = useScenePalette();
-  const year = new Date().getFullYear();
 
   return (
     <section
       ref={sectionRef}
       id="home"
-      className="relative flex min-h-[100svh] flex-col overflow-hidden px-6 pb-10 pt-28 md:px-12 md:pt-32"
+      className="relative flex min-h-[100svh] flex-col overflow-hidden px-6 pb-12 pt-28 md:px-12 md:pt-32"
     >
-      {/* Blueprint grid — hero only */}
-      <div
-        aria-hidden
-        className="grid-lines pointer-events-none absolute inset-0 z-0 opacity-60"
-        style={{
-          WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 35%, #000 20%, transparent 75%)",
-          maskImage: "radial-gradient(ellipse 70% 60% at 50% 35%, #000 20%, transparent 75%)",
-        }}
-      />
-      {/* 3D: grey cube wave field */}
+      {/* 3D: grey cube wave field (on solid black — no grid behind it) */}
       <motion.div
         aria-hidden
         initial={{ opacity: 0 }}
@@ -84,26 +69,6 @@ export function Hero({ profile, stats }: { profile: Profile; stats: Stat[] }) {
         aria-hidden
         className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-40 bg-gradient-to-b from-transparent to-canvas"
       />
-
-      {/* HUD corners */}
-      <div className="pointer-events-none absolute inset-x-6 top-24 z-10 hidden justify-between md:inset-x-12 md:flex">
-        <motion.span
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.1, duration: 1 }}
-          className="label"
-        >
-          {profile.initials} — Portfolio / ©{year}
-        </motion.span>
-        <motion.span
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 1 }}
-          className="label tabular"
-        >
-          {profile.location} — <LocalTime timeZone={profile.timezone} withSeconds showZone />
-        </motion.span>
-      </div>
 
       {/* Centered copy — weighted toward the lower part of the viewport */}
       <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col items-center text-center">
@@ -202,24 +167,6 @@ export function Hero({ profile, stats }: { profile: Profile; stats: Stat[] }) {
           </div>
         </motion.div>
       )}
-
-      {/* Bottom HUD */}
-      <div className="relative z-10 mx-auto mt-4 flex w-full max-w-4xl items-center justify-between">
-        <span className="label hidden tabular md:inline">
-          {formatCoord(profile.coordinates.lat, "N", "S")} / {formatCoord(profile.coordinates.lng, "E", "W")}
-        </span>
-        <button
-          onClick={() => scrollTo("#about")}
-          className="label mx-auto flex items-center gap-2 transition-colors hover:text-fg md:mx-0"
-          aria-label="Scroll to about"
-        >
-          Scroll
-          <span className="relative flex h-6 w-px overflow-hidden bg-fg/15">
-            <span className="absolute inset-0 animate-scan-y bg-accent" />
-          </span>
-          <ArrowDown size={12} />
-        </button>
-      </div>
     </section>
   );
 }

@@ -128,18 +128,6 @@ export function About({ index, profile }: { index: string; profile: Profile }) {
                 <div className="mt-2 text-sm text-fg">{profile.area || profile.location}</div>
                 {profile.area ? <div className="mt-0.5 text-xs text-subtle">{profile.location}</div> : null}
               </div>
-              <a
-                href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=15/${lat}/${lng}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="label absolute right-5 top-5 normal-case tracking-normal text-subtle/80 transition-colors hover:text-accent"
-              >
-                © OpenStreetMap
-              </a>
-              <div className="label pointer-events-none absolute bottom-5 right-5 text-right tabular">
-                {Math.abs(lat).toFixed(4)}° {lat < 0 ? "S" : "N"} / {Math.abs(lng).toFixed(4)}° {lng < 0 ? "W" : "E"}
-              </div>
-              <div className="label pointer-events-none absolute bottom-5 left-5">Fig 1.0 — Home</div>
             </div>
           </Reveal>
         </div>

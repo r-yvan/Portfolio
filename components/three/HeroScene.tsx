@@ -112,7 +112,8 @@ function WaveField({ palette, reduced, compact }: { palette: ScenePalette; reduc
         Math.sin(radial * 0.78 - t * 1.05) * 0.24;
       const dx = x - fx;
       const dz = z - fz;
-      const lens = Math.exp(-(dx * dx + dz * dz) * 0.5) * 1.45 * k;
+      // Subtle hover lift: a small, tight bump under the cursor
+      const lens = Math.exp(-(dx * dx + dz * dz) * 0.8) * 0.4 * k;
       const h = 0.16 + (wave + 0.7) * 0.72 + lens;
 
       const o = i * 16;

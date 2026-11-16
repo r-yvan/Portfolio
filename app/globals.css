@@ -36,9 +36,9 @@
 }
 
 .dark {
-  --canvas: 10 10 10;
-  --canvas-2: 14 14 14;
-  --surface: 17 17 17;
+  --canvas: 0 0 0;
+  --canvas-2: 8 8 8;
+  --surface: 12 12 12;
   --fg: 244 244 244;
   --muted: 163 163 163;
   --subtle: 128 128 128;

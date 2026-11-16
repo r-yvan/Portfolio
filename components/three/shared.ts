@@ -64,7 +64,7 @@ export type ScenePalette = {
 
 export const DARK_PALETTE: ScenePalette = {
   dark: true,
-  bg: "#0a0a0a",
+  bg: "#000000",
   low: "#1a1a1a",
   high: "#9a9a9a",
   line: "#7a7a7a",
