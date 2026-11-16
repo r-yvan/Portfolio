@@ -16,7 +16,7 @@ export function Counter({
   className?: string;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-20% 0px" });
+  const inView = useInView(ref, { once: true, margin: "0px 0px -24px 0px" });
   const [display, setDisplay] = useState(0);
 
   useEffect(() => {

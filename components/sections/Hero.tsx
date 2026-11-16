@@ -1,192 +1,225 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import { ArrowDown, ArrowUpRight, Github, Instagram, Mail } from "lucide-react";
+import { ArrowDown, ArrowUpRight } from "lucide-react";
+import { useScrollTo } from "@/components/providers/SmoothScroll";
+import { Counter } from "@/components/ui/Counter";
+import { Crosshairs } from "@/components/ui/Crosshairs";
+import { LocalTime } from "@/components/ui/LocalTime";
 import { Magnetic } from "@/components/ui/Magnetic";
-import { useLenis } from "@/components/providers/SmoothScroll";
-import { site } from "@/lib/site";
+import { RichHeading } from "@/components/ui/RichHeading";
+import { Scramble } from "@/components/ui/Scramble";
+import { useSceneActive, useScenePalette } from "@/components/three/shared";
+import type { Profile, Stat } from "@/lib/content/schema";
 
-// Three.js scene is browser-only — load without SSR to avoid hydration issues.
-const HeroScene = dynamic(() => import("@/components/three/HeroScene"), {
-  ssr: false,
-  loading: () => null,
-});
+const HeroScene = dynamic(() => import("@/components/three/HeroScene"), { ssr: false });
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-const socials = [
-  { icon: Github, ...site.socials.github },
-  { icon: Instagram, ...site.socials.instagram },
-  { icon: Mail, ...site.socials.email },
-];
+function RoleRotator({ roles }: { roles: string[] }) {
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    if (roles.length < 2) return;
+    const id = window.setInterval(() => setIndex((i) => (i + 1) % roles.length), 2800);
+    return () => window.clearInterval(id);
+  }, [roles.length]);
+  return <Scramble text={roles[index] ?? ""} playOnMount duration={600} />;
+}
 
-export function Hero() {
-  const lenis = useLenis();
+const STAT_COLS: Record<number, string> = {
+  1: "grid-cols-1",
+  2: "grid-cols-2",
+  3: "grid-cols-2 sm:grid-cols-3",
+  4: "grid-cols-2 sm:grid-cols-4",
+};
 
-  const go = (href: string) => {
-    const el = document.querySelector(href) as HTMLElement | null;
-    if (!el) return;
-    if (lenis) lenis.scrollTo(el, { offset: -20 });
-    else el.scrollIntoView({ behavior: "smooth" });
-  };
+function formatCoord(value: number, pos: string, neg: string) {
+  return `${Math.abs(value).toFixed(4)}° ${value >= 0 ? pos : neg}`;
+}
+
+export function Hero({ profile, stats }: { profile: Profile; stats: Stat[] }) {
+  const scrollTo = useScrollTo();
+  const sectionRef = useRef<HTMLElement>(null);
+  const active = useSceneActive(sectionRef);
+  const palette = useScenePalette();
+  const year = new Date().getFullYear();
 
   return (
     <section
+      ref={sectionRef}
       id="home"
-      className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden px-6 pb-24 pt-32 md:px-12"
+      className="relative flex min-h-[100svh] flex-col overflow-hidden px-6 pb-10 pt-28 md:px-12 md:pt-32"
     >
-      {/* 3D nebula + crystalline core */}
-      <div className="absolute inset-0 z-0">
-        <HeroScene />
-      </div>
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-48 bg-gradient-to-b from-transparent to-ink-950" />
-      <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-r from-ink-950 via-ink-950/85 to-transparent" />
+      {/* Blueprint grid — hero only */}
+      <div
+        aria-hidden
+        className="grid-lines pointer-events-none absolute inset-0 z-0 opacity-60"
+        style={{
+          WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 35%, #000 20%, transparent 75%)",
+          maskImage: "radial-gradient(ellipse 70% 60% at 50% 35%, #000 20%, transparent 75%)",
+        }}
+      />
+      {/* 3D: grey cube wave field */}
+      <motion.div
+        aria-hidden
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 2, delay: 0.2 }}
+        className="absolute inset-0 z-0"
+      >
+        <HeroScene palette={palette} active={active} />
+      </motion.div>
+      {/* legibility: soft radial scrim behind the copy + bottom fade */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-[1]"
+        style={{
+          background:
+            "radial-gradient(ellipse 55% 42% at 50% 54%, rgb(var(--canvas) / 0.82), rgb(var(--canvas) / 0.35) 60%, transparent 85%)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-40 bg-gradient-to-b from-transparent to-canvas"
+      />
 
-      {/* Corner technical tag (Linear reference) */}
-      <div className="pointer-events-none absolute right-6 top-28 z-10 hidden font-mono text-[0.7rem] uppercase tracking-[0.3em] text-ash-700 md:block">
-        FIG 0.1 / HERO
+      {/* HUD corners */}
+      <div className="pointer-events-none absolute inset-x-6 top-24 z-10 hidden justify-between md:inset-x-12 md:flex">
+        <motion.span
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.1, duration: 1 }}
+          className="label"
+        >
+          {profile.initials} — Portfolio / ©{year}
+        </motion.span>
+        <motion.span
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2, duration: 1 }}
+          className="label tabular"
+        >
+          {profile.location} — <LocalTime timeZone={profile.timezone} withSeconds showZone />
+        </motion.span>
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl">
+      {/* Centered copy — weighted toward the lower part of the viewport */}
+      <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col items-center text-center">
+        <div aria-hidden className="min-h-10 flex-[1.7]" />
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: EASE }}
-          className="section-label mb-8"
+          transition={{ duration: 0.8, delay: 0.3, ease: EASE }}
+          className="label mb-3 inline-flex items-center gap-2 border border-fg/10 bg-canvas/60 px-2.5 py-1.5 backdrop-blur-md"
         >
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-iris-500 opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-iris-400" />
+            {profile.available && (
+              <span className="absolute inline-flex h-full w-full animate-ping-square bg-accent" />
+            )}
+            <span className={profile.available ? "relative h-2 w-2 bg-accent" : "relative h-2 w-2 bg-subtle"} />
           </span>
-          {site.displayName} — Software Engineer & Designer
+          <span className="text-fg/80">{profile.available ? profile.availability : profile.title}</span>
         </motion.div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.1, ease: EASE }}
-          className="font-display text-[clamp(2.6rem,7.4vw,6.4rem)] font-medium leading-[0.94] tracking-tight text-white"
+        <RichHeading
+          as="h1"
+          markup={profile.headline}
+          immediate
+          delay={0.45}
+          stagger={0.06}
+          className="h-display max-w-[15ch] text-balance"
+        />
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 1.1 }}
+          className="label mt-3 flex items-center gap-1.5 text-muted"
         >
-          <span className="block">
-            I build{" "}
-            <span className="font-serif font-light italic text-ash-100">
-              digital
-            </span>
-          </span>
-          <span className="block">
-            <span className="relative font-serif font-light italic text-ash-100">
-              experiences
-              <span className="absolute -bottom-1 left-0 h-px w-full bg-iris-400/70" />
-            </span>{" "}
-            for
-          </span>
-          <span className="block">
-            <span className="relative font-serif font-light italic text-ash-100">
-              ambitious
-              <span className="absolute -bottom-1 left-0 h-px w-full bg-iris-400/70" />
-            </span>{" "}
-            ideas<span className="text-ash-500">.</span>
-          </span>
-        </motion.h1>
+          <span className="text-accent">[</span>
+          <RoleRotator roles={profile.roles} />
+          <span className="text-accent">]</span>
+        </motion.div>
 
         <motion.p
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.85, ease: EASE }}
-          className="mt-8 max-w-md font-body text-base font-light leading-relaxed text-ash-400/90 md:text-lg"
+          transition={{ duration: 0.8, delay: 1.2, ease: EASE }}
+          className="mt-2 max-w-md text-[0.95rem] leading-snug text-muted md:text-base"
         >
-          {site.tagline}
+          {profile.tagline}
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5, ease: EASE }}
-          className="mt-10 flex flex-wrap items-center gap-4"
+          transition={{ duration: 0.8, delay: 1.3, ease: EASE }}
+          className="mt-5 flex flex-wrap items-center justify-center gap-2"
         >
-          <Magnetic strength={0.4}>
-            <button
-              onClick={() => go("#work")}
-              data-cursor="hover"
-              className="group flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-ink-950 transition-colors hover:bg-ash-100"
-            >
-              View my work
+          <Magnetic strength={0.3}>
+            <button onClick={() => scrollTo("#work")} className="btn btn-primary btn-sm group h-10 px-4">
+              <span>View my work</span>
               <ArrowUpRight
-                size={16}
-                className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                size={15}
+                className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
               />
             </button>
           </Magnetic>
-          <Magnetic strength={0.4}>
-            <button
-              onClick={() => go("#contact")}
-              data-cursor="hover"
-              className="flex items-center gap-2 rounded-full border border-white/15 px-6 py-3 text-sm font-medium text-ash-200 transition-colors hover:border-white/30 hover:text-white"
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-iris-400" />
-              Get in touch
+          <Magnetic strength={0.3}>
+            <button onClick={() => scrollTo("#contact")} className="btn btn-ghost btn-sm h-10 bg-canvas/40 px-4 backdrop-blur-md">
+              <span>Get in touch</span>
             </button>
           </Magnetic>
-
-          <div className="ml-2 flex items-center gap-1">
-            {socials.map(({ icon: Icon, label, url }) => (
-              <a
-                key={label}
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={label}
-                className="flex h-10 w-10 items-center justify-center rounded-full text-ash-500 transition-colors hover:text-white"
-              >
-                <Icon size={17} />
-              </a>
-            ))}
-          </div>
         </motion.div>
-
-        {/* Stats row */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.7, ease: EASE }}
-          className="mt-14 flex flex-wrap items-center gap-x-10 gap-y-4 border-t border-white/10 pt-6 font-mono text-xs text-ash-500"
-        >
-          {[
-            { v: "3+", l: "Years building" },
-            { v: "20+", l: "Projects shipped" },
-            { v: "15+", l: "Technologies" },
-          ].map((s) => (
-            <div key={s.l} className="flex items-center gap-2.5">
-              <span className="h-1.5 w-1.5 rounded-[1px] bg-iris-400" />
-              <span className="text-base font-semibold text-white">{s.v}</span>
-              <span className="uppercase tracking-widest">{s.l}</span>
-            </div>
-          ))}
-        </motion.div>
+        <div aria-hidden className="flex-[0.3]" />
       </div>
 
-      {/* Scroll indicator */}
-      <motion.button
-        onClick={() => go("#about")}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.3, duration: 1 }}
-        className="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 text-ash-500"
-        aria-label="Scroll to about"
-      >
-        <span className="font-mono text-[0.6rem] uppercase tracking-[0.4em]">
+      {/* Stats strip — framed grid with registration marks */}
+      {stats.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 1.45, ease: EASE }}
+          className="relative z-10 mx-auto mt-7 w-full max-w-4xl"
+        >
+          <div className="relative border border-fg/10 bg-canvas/55 backdrop-blur-md">
+            <Crosshairs />
+            <dl className={`grid divide-x divide-fg/10 ${STAT_COLS[Math.min(stats.length, 4)]}`}>
+              {stats.map((stat, i) => (
+                <div
+                  key={stat.label}
+                  className={i > 1 ? "hidden px-4 py-3 text-left sm:block" : "px-4 py-3 text-left"}
+                >
+                  <dt className="label">{stat.label}</dt>
+                  <dd className="mt-1.5 text-xl font-medium tracking-tight tabular md:text-2xl">
+                    <Counter value={stat.value} suffix={stat.suffix} />
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Bottom HUD */}
+      <div className="relative z-10 mx-auto mt-4 flex w-full max-w-4xl items-center justify-between">
+        <span className="label hidden tabular md:inline">
+          {formatCoord(profile.coordinates.lat, "N", "S")} / {formatCoord(profile.coordinates.lng, "E", "W")}
+        </span>
+        <button
+          onClick={() => scrollTo("#about")}
+          className="label mx-auto flex items-center gap-2 transition-colors hover:text-fg md:mx-0"
+          aria-label="Scroll to about"
+        >
           Scroll
-        </span>
-        <span className="relative flex h-10 w-px overflow-hidden bg-white/10">
-          <motion.span
-            animate={{ y: ["-100%", "100%"] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute inset-0 bg-gradient-to-b from-transparent via-iris-400 to-transparent"
-          />
-        </span>
-        <ArrowDown size={14} className="text-ash-500" />
-      </motion.button>
+          <span className="relative flex h-6 w-px overflow-hidden bg-fg/15">
+            <span className="absolute inset-0 animate-scan-y bg-accent" />
+          </span>
+          <ArrowDown size={12} />
+        </button>
+      </div>
     </section>
   );
 }

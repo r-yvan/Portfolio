@@ -3,56 +3,55 @@
 @tailwind utilities;
 
 /* ============================================================
-   DISPLAY FONT — Lay Grotesk (self-hosted, woff2)
-   Free foundry-trial subset (A–Z a–z 0–9 ! , . ?). Space Grotesk is
-   the complete fallback for every other glyph + all body/UI text, so
-   missing characters render seamlessly in the same grotesk voice.
+   SATOSHI — loaded from the official Fontshare API (see layout).
+   This metric-matched local fallback keeps text from jumping
+   while the real font streams in (no layout shift on swap).
    ============================================================ */
 @font-face {
-  font-family: "Lay Grotesk";
-  src: url("/fonts/lay-medium.woff2") format("woff2");
-  font-weight: 300 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Lay Grotesk";
-  src: url("/fonts/lay-semibold.woff2") format("woff2");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Lay Grotesk";
-  src: url("/fonts/lay-black.woff2") format("woff2");
-  font-weight: 700 900;
-  font-style: normal;
-  font-display: swap;
+  font-family: "Satoshi Fallback";
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans"),
+    local("Helvetica Neue"), local("Helvetica");
+  size-adjust: 102%;
+  ascent-override: 99%;
+  descent-override: 23.5%;
+  line-gap-override: 9.8%;
 }
 
 /* ============================================================
-   DESIGN TOKENS
+   THEME TOKENS (space-separated RGB so Tailwind can add alpha)
+   Light is the base; `.dark` on <html> switches the palette.
    ============================================================ */
 :root {
-  --ink-950: #050505;
-  --ink-900: #0a0a0a;
-  --ink-850: #0d0d0d;
+  --canvas: 250 250 249;
+  --canvas-2: 242 242 240;
+  --surface: 255 255 255;
+  --fg: 12 12 12;
+  --muted: 82 82 82;
+  --subtle: 107 107 107;
+  --accent: 217 30 30;
+  --accent-deep: 168 18 18;
+  --accent-fg: 255 255 255;
+  --rail: 1.5rem;
+  color-scheme: light;
+}
 
-  --ash-900: #1a1a1a;
-  --ash-700: #3d3d3d;
-  --ash-500: #6b6b6b;
-  --ash-400: #a0a0a0;
+.dark {
+  --canvas: 10 10 10;
+  --canvas-2: 14 14 14;
+  --surface: 17 17 17;
+  --fg: 244 244 244;
+  --muted: 163 163 163;
+  --subtle: 128 128 128;
+  --accent: 255 59 59;
+  --accent-deep: 196 28 28;
+  --accent-fg: 10 10 10;
+  color-scheme: dark;
+}
 
-  --iris-300: #c4b5fd;
-  --iris-400: #a78bfa;
-  --iris-500: #8b5cf6;
-  --iris-600: #7b5ea7;
-  --iris-700: #6d28d9;
-
-  --grid: rgba(255, 255, 255, 0.038);
-  --grid-size: 64px;
+@media (min-width: 768px) {
+  :root {
+    --rail: 3rem;
+  }
 }
 
 /* ============================================================
@@ -60,104 +59,182 @@
    ============================================================ */
 @layer base {
   * {
-    @apply border-white/5;
+    border-color: rgb(var(--fg) / 0.1);
   }
 
   html {
-    background-color: var(--ink-950);
+    position: relative; /* scroll-linked animations measure against this */
+    background-color: rgb(var(--canvas));
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   body {
-    @apply bg-ink-950 font-body text-ash-100/90 antialiased;
+    @apply bg-canvas font-sans text-fg antialiased;
+    font-feature-settings: "ss01" on;
+    letter-spacing: -0.028em; /* Satoshi reads best set tight */
+    line-height: 1.42;
     overflow-x: hidden;
   }
 
-  /* Lay Grotesk is geometric — pull the display tracking tight for
-     the stunning, condensed editorial headlines. */
-  .font-display {
-    letter-spacing: -0.03em;
-  }
-
-  /* Inverted accent: every serif-italic accent word reads blueviolet,
-     overriding whatever text color the markup sets. */
-  .font-serif.italic {
-    color: var(--iris-400);
+  em,
+  i {
+    font-style: normal; /* emphasis is colour, not slant */
   }
 
   ::selection {
-    background: var(--iris-500);
-    color: #fff;
+    background: rgb(var(--accent));
+    color: rgb(var(--accent-fg));
   }
 
-  /* Thin violet scrollbar */
+  :focus-visible {
+    outline: 2px solid rgb(var(--accent));
+    outline-offset: 3px;
+  }
+
+  /* Sharp, minimal scrollbar */
   ::-webkit-scrollbar {
-    width: 9px;
-    height: 9px;
+    width: 10px;
+    height: 10px;
   }
-
   ::-webkit-scrollbar-track {
-    background: var(--ink-950);
+    background: rgb(var(--canvas));
   }
-
   ::-webkit-scrollbar-thumb {
-    background: linear-gradient(var(--iris-700), var(--iris-500));
-    border-radius: 999px;
-    border: 2px solid var(--ink-950);
+    background: rgb(var(--fg) / 0.18);
+    border: 3px solid rgb(var(--canvas));
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--accent));
   }
 
-  /* Hide native cursor on devices that support the custom one */
+  /* Hide the native cursor while the custom one is active */
   @media (hover: hover) and (pointer: fine) {
-
     body.has-custom-cursor,
     body.has-custom-cursor * {
-      cursor: none;
+      cursor: none !important;
     }
   }
 }
 
 /* ============================================================
-   COMPONENT UTILITIES
+   COMPONENTS
    ============================================================ */
 @layer components {
-
-  /* Glassmorphism card used on public site + admin */
-  .glass {
-    @apply border border-white/10 bg-white/[0.03] backdrop-blur-xl;
+  /* Small eyebrow label (sentence case — no shouting) */
+  .label {
+    @apply text-[0.78rem] font-medium leading-none tracking-[-0.01em] text-subtle;
   }
 
-  .glass-strong {
-    @apply border border-white/10 bg-white/[0.05] backdrop-blur-2xl;
+  /* Display + section headline scales */
+  .h-display {
+    font-size: clamp(2.6rem, 7.2vw, 6.9rem);
+    line-height: 0.88;
+    letter-spacing: -0.072em;
+    @apply font-medium;
+  }
+  .h-section {
+    font-size: clamp(2rem, 4.8vw, 4rem);
+    line-height: 0.95;
+    letter-spacing: -0.062em;
+    @apply font-medium;
   }
 
-  /* Monospace section label e.g. [02] SELECTED WORK / 2024 — 2026 */
-  .section-label {
-    @apply inline-flex items-center gap-2 font-mono text-[0.7rem] uppercase tracking-[0.32em] text-ash-500;
+  /* Headline tones: *accent* (red, upright) and _muted lead-in_ */
+  .tone-accent {
+    @apply not-italic text-accent;
+  }
+  .tone-muted {
+    @apply text-subtle;
   }
 
-  /* Bordered monospace tech pill (wibify reference) */
-  .tag {
-    @apply inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.02] px-2.5 py-1 font-mono text-[0.68rem] uppercase tracking-wider text-ash-400 transition-colors duration-300;
+  /* ---------- Buttons: sharp, with a hard sweep fill on hover ---------- */
+  .btn {
+    @apply relative inline-flex h-11 select-none items-center justify-center gap-2 whitespace-nowrap border px-5 text-sm font-medium transition-colors duration-300 disabled:pointer-events-none disabled:opacity-50;
+    isolation: isolate;
+  }
+  .btn::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    background: rgb(var(--fg));
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .btn:hover::before,
+  .btn:focus-visible::before {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+  .btn:hover,
+  .btn:focus-visible {
+    color: rgb(var(--canvas));
+    border-color: rgb(var(--fg));
+  }
+  .btn-primary {
+    @apply border-accent bg-accent text-accent-fg;
+  }
+  .btn-ghost {
+    @apply border-fg/15 bg-transparent text-fg;
+  }
+  .btn-solid {
+    @apply border-fg bg-fg text-canvas;
+  }
+  .btn-solid::before {
+    background: rgb(var(--accent));
+  }
+  .btn-solid:hover,
+  .btn-solid:focus-visible {
+    color: rgb(var(--accent-fg));
+    border-color: rgb(var(--accent));
+  }
+  .btn-danger {
+    @apply border-accent/40 bg-transparent text-accent;
+  }
+  .btn-danger::before {
+    background: rgb(var(--accent));
+  }
+  .btn-danger:hover,
+  .btn-danger:focus-visible {
+    color: rgb(var(--accent-fg));
+    border-color: rgb(var(--accent));
+  }
+  .btn-sm {
+    @apply h-9 px-3.5 text-[0.8rem];
+  }
+  .btn-icon {
+    @apply h-10 w-10 px-0;
   }
 
-  .tag:hover {
-    @apply border-iris-500/50 text-iris-300;
+  /* ---------- Surfaces ---------- */
+  .panel {
+    @apply border border-fg/10 bg-surface;
   }
 
-  /* Giant ghost outline numerals (wibify reference) */
-  .ghost-number {
-    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.12);
-    color: transparent;
-    @apply font-display font-bold leading-none;
+  .chip {
+    @apply inline-flex items-center gap-1.5 border border-fg/10 px-2.5 py-1 text-[0.75rem] font-medium leading-none tracking-[-0.01em] text-muted transition-colors duration-300;
   }
 
-  .text-gradient {
-    @apply bg-gradient-to-br from-white via-ash-100 to-ash-400 bg-clip-text text-transparent;
+  /* ---------- Form controls (site + admin) ---------- */
+  .input {
+    @apply h-11 w-full border border-fg/15 bg-transparent px-3.5 text-sm text-fg outline-none transition-colors duration-200 placeholder:text-subtle/80 hover:border-fg/30 focus:border-accent focus-visible:outline-none;
   }
-
-  .text-iris-gradient {
-    @apply bg-gradient-to-br from-iris-300 via-iris-400 to-iris-600 bg-clip-text text-transparent;
+  textarea.input {
+    @apply h-auto py-3 leading-relaxed;
+  }
+  select.input {
+    @apply appearance-none bg-no-repeat pr-9;
+    background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+      linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%;
+    background-size: 5px 5px, 5px 5px;
+  }
+  select.input option {
+    background: rgb(var(--surface));
+    color: rgb(var(--fg));
   }
 }
 
@@ -165,87 +242,95 @@
    UTILITIES
    ============================================================ */
 @layer utilities {
-
-  /* Fluid type helpers */
-  .text-display {
-    font-size: clamp(2.75rem, 9vw, 9rem);
-    line-height: 0.92;
-    letter-spacing: -0.04em;
+  /* Blueprint grid lines */
+  .grid-lines {
+    background-image: linear-gradient(
+        to right,
+        rgb(var(--fg) / 0.045) 1px,
+        transparent 1px
+      ),
+      linear-gradient(to bottom, rgb(var(--fg) / 0.045) 1px, transparent 1px);
+    background-size: 48px 48px;
   }
 
-  .text-section-title {
-    font-size: clamp(2rem, 5.5vw, 4.5rem);
-    line-height: 0.95;
-    letter-spacing: -0.035em;
-  }
-
-  /* Continuous blueprint grid layer */
-  .blueprint-grid {
-    background-image: var(--tw-bg-grid, none),
-      linear-gradient(to right, var(--grid) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
-    background-size: var(--grid-size) var(--grid-size);
-  }
-
-  /* Fade the grid out toward the viewport edges */
-  .mask-radial {
-    -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 40%,
-        #000 30%,
-        transparent 100%);
-    mask-image: radial-gradient(ellipse 80% 80% at 50% 40%,
-        #000 30%,
-        transparent 100%);
-  }
-
-  .mask-fade-y {
-    -webkit-mask-image: linear-gradient(to bottom,
-        transparent,
-        #000 12%,
-        #000 88%,
-        transparent);
-    mask-image: linear-gradient(to bottom,
-        transparent,
-        #000 12%,
-        #000 88%,
-        transparent);
+  .text-outline {
+    color: transparent;
+    -webkit-text-stroke: 1px rgb(var(--fg) / 0.16);
   }
 
   .mask-fade-x {
-    -webkit-mask-image: linear-gradient(to right,
-        transparent,
-        #000 8%,
-        #000 92%,
-        transparent);
-    mask-image: linear-gradient(to right,
-        transparent,
-        #000 8%,
-        #000 92%,
-        transparent);
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 10%,
+      #000 90%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 10%,
+      #000 90%,
+      transparent
+    );
   }
 
-  /* Film grain overlay */
+  .mask-fade-y {
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      #000 12%,
+      #000 88%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      #000 12%,
+      #000 88%,
+      transparent
+    );
+  }
+
+  /* Film grain (dark mode only — it reads as dirt on white) */
   .grain::after {
     content: "";
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.035;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .dark .grain::after {
+    opacity: 0.04;
   }
 
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
-
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
 }
 
-/* Respect reduced motion */
-@media (prefers-reduced-motion: reduce) {
+/* ============================================================
+   THEME SWITCH — circular reveal via the View Transitions API
+   ============================================================ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
 
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
@@ -263,19 +348,15 @@ html.lenis,
 html.lenis body {
   height: auto;
 }
-
 .lenis.lenis-smooth {
   scroll-behavior: auto !important;
 }
-
 .lenis.lenis-smooth [data-lenis-prevent] {
   overscroll-behavior: contain;
 }
-
 .lenis.lenis-stopped {
   overflow: hidden;
 }
-
 .lenis.lenis-smooth iframe {
   pointer-events: none;
 }

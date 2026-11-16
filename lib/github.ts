@@ -1,25 +1,8 @@
-import { site } from "@/lib/site";
+import "server-only";
+import type { Project } from "@/lib/content/schema";
+import { isHttpUrl, slugify } from "@/lib/content/schema";
 
-export type ProjectCategory = "Web" | "Tool" | "Experiment" | "Other";
-
-export type Project = {
-  id: number;
-  name: string;
-  title: string;
-  description: string;
-  url: string;
-  homepage: string | null;
-  language: string | null;
-  topics: string[];
-  stars: number;
-  forks: number;
-  updatedAt: string;
-  category: ProjectCategory;
-  featured: boolean;
-  image: string | null;
-};
-
-type GitHubRepo = {
+export type GitHubRepo = {
   id: number;
   name: string;
   description: string | null;
@@ -28,109 +11,79 @@ type GitHubRepo = {
   language: string | null;
   topics?: string[];
   stargazers_count: number;
-  forks_count: number;
   updated_at: string;
+  created_at: string;
   fork: boolean;
   archived: boolean;
 };
 
-const WEB_LANGS = ["JavaScript", "TypeScript", "HTML", "CSS", "Vue", "Svelte"];
+const WEB = ["JavaScript", "TypeScript", "HTML", "CSS", "Vue", "Svelte", "PHP"];
+const MOBILE_HINTS = ["react-native", "expo", "flutter", "android", "ios", "mobile"];
+const VISION_HINTS = ["opencv", "vision", "ml", "ai", "detection", "recognition"];
 
-function prettify(name: string) {
-  return name
-    .replace(/[-_]/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase())
-    .replace(/\bApi\b/g, "API")
-    .replace(/\bUi\b/g, "UI")
-    .replace(/\b3d\b/gi, "3D");
-}
-
-function categorize(repo: GitHubRepo): ProjectCategory {
-  const topics = repo.topics ?? [];
-  const has = (...t: string[]) => t.some((x) => topics.includes(x));
-  if (has("experiment", "demo", "3d", "shader", "generative", "webgl"))
-    return "Experiment";
-  if (has("cli", "tool", "library", "package", "npm")) return "Tool";
-  if (
-    has("website", "portfolio", "web", "nextjs", "react", "webapp", "app") ||
-    (repo.language && WEB_LANGS.includes(repo.language))
-  )
-    return "Web";
+function categorize(repo: GitHubRepo) {
+  const hay = [...(repo.topics ?? []), repo.name.toLowerCase(), (repo.description ?? "").toLowerCase()].join(" ");
+  if (MOBILE_HINTS.some((h) => hay.includes(h)) || repo.language === "Dart" || repo.language === "Kotlin" || repo.language === "Swift")
+    return "Mobile";
+  if (VISION_HINTS.some((h) => hay.includes(h)) || repo.language === "Python") return "AI & Vision";
+  if (repo.language && WEB.includes(repo.language)) return "Web";
   return "Other";
 }
 
-/** Curated fallback so the section never renders empty (offline / rate-limited). */
-const FALLBACK: Project[] = [
-  {
-    id: 1,
-    name: "portfolio",
-    title: "Portfolio",
-    description:
-      "This site — a Three.js-driven personal portfolio with a custom motion system, built in Next.js.",
-    url: `https://github.com/${site.githubUser}`,
-    homepage: null,
-    language: "TypeScript",
-    topics: ["nextjs", "threejs", "framer-motion"],
-    stars: 0,
-    forks: 0,
-    updatedAt: new Date().toISOString(),
-    category: "Web",
-    featured: true,
-    image: null,
-  },
-];
+export function repoToProject(repo: GitHubRepo, takenIds: Iterable<string> = []): Project {
+  const taken = new Set(takenIds);
+  let id = slugify(repo.name);
+  for (let n = 2; taken.has(id); n++) id = `${slugify(repo.name)}-${n}`;
+  const homepage = repo.homepage?.trim() ?? "";
+  return {
+    id,
+    title: repo.name,
+    summary: (repo.description ?? "").slice(0, 320),
+    category: categorize(repo),
+    tags: [repo.language, ...(repo.topics ?? [])].filter((t): t is string => !!t).slice(0, 5),
+    year: repo.created_at.slice(0, 4),
+    role: "",
+    image: "",
+    imageAlt: "",
+    liveUrl: homepage && isHttpUrl(homepage) && !homepage.includes("github.com") ? homepage : "",
+    repoUrl: repo.html_url,
+    featured: false,
+    visible: true,
+  };
+}
 
-/**
- * Fetches public repos from GitHub, transforms + ranks them for display.
- * Server-side with ISR caching; set GITHUB_TOKEN to raise the rate limit.
- */
-export async function getProjects(): Promise<Project[]> {
+/** Public, non-fork, non-archived repos for a user (most recently updated first). */
+export async function fetchRepos(user: string): Promise<GitHubRepo[]> {
+  if (!user) return [];
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.github+json",
+    "User-Agent": "portfolio-cms",
+  };
+  if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+  const res = await fetch(`https://api.github.com/users/${encodeURIComponent(user)}/repos?per_page=100&sort=updated`, {
+    headers,
+    next: { revalidate: 3600 },
+  });
+  if (!res.ok) throw new Error(`GitHub responded ${res.status}${res.status === 403 ? " (rate limited — set GITHUB_TOKEN)" : ""}.`);
+  const repos = (await res.json()) as GitHubRepo[];
+  if (!Array.isArray(repos)) return [];
+  return repos.filter((r) => !r.fork && !r.archived && r.name.toLowerCase() !== user.toLowerCase());
+}
+
+/** Fallback list for the public site when no curated projects exist. */
+export async function githubFallbackProjects(user: string): Promise<Project[]> {
   try {
-    const headers: Record<string, string> = {
-      Accept: "application/vnd.github+json",
-    };
-    if (process.env.GITHUB_TOKEN) {
-      headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
-    }
-
-    const res = await fetch(
-      `https://api.github.com/users/${site.githubUser}/repos?per_page=100&sort=updated`,
-      { headers, next: { revalidate: 3600 } },
-    );
-    if (!res.ok) return FALLBACK;
-
-    const repos = (await res.json()) as GitHubRepo[];
-    if (!Array.isArray(repos)) return FALLBACK;
-
-    const projects = repos
-      .filter((r) => !r.fork && !r.archived && r.name !== site.githubUser)
-      .map<Project>((r) => ({
-        id: r.id,
-        name: r.name,
-        title: prettify(r.name),
-        description: r.description ?? "No description provided.",
-        url: r.html_url,
-        homepage: r.homepage && r.homepage.trim() ? r.homepage : null,
-        language: r.language,
-        topics: r.topics ?? [],
-        stars: r.stargazers_count,
-        forks: r.forks_count,
-        updatedAt: r.updated_at,
-        category: categorize(r),
-        featured: false,
-        image: null,
-      }))
-      .sort(
-        (a, b) =>
-          b.stars - a.stars ||
-          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-      );
-
-    if (!projects.length) return FALLBACK;
-    // Mark the strongest few as featured for emphasis.
-    projects.slice(0, 2).forEach((p) => (p.featured = true));
-    return projects.slice(0, 12);
+    const repos = await fetchRepos(user);
+    const ids: string[] = [];
+    return repos
+      .sort((a, b) => b.stargazers_count - a.stargazers_count || +new Date(b.updated_at) - +new Date(a.updated_at))
+      .slice(0, 12)
+      .map((r) => {
+        const p = repoToProject(r, ids);
+        ids.push(p.id);
+        return p;
+      });
   } catch {
-    return FALLBACK;
+    return [];
   }
 }

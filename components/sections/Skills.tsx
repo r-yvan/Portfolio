@@ -1,110 +1,109 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowUpRight, Layers, PenTool, Server, Wrench } from "lucide-react";
-import { SectionLabel } from "@/components/ui/SectionLabel";
+import { Box, Cpu, Layers, PenTool, Server, Wrench } from "lucide-react";
+import { Crosshairs } from "@/components/ui/Crosshairs";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { SkillIcon } from "@/components/ui/SkillIcon";
-import { skillCategories, skills, type SkillCategory } from "@/lib/skills";
+import type { SkillGroup } from "@/lib/content/schema";
+import { cn } from "@/lib/utils";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-const CATEGORY_META: Record<
-  SkillCategory,
-  { icon: typeof Layers; blurb: string }
-> = {
-  Frontend: {
-    icon: Layers,
-    blurb:
-      "Pixel-precise, motion-rich interfaces built on modern React and the web platform.",
-  },
-  Backend: {
-    icon: Server,
-    blurb:
-      "APIs, data models and server logic engineered to stay fast under real-world load.",
-  },
-  Design: {
-    icon: PenTool,
-    blurb:
-      "Turning rough ideas into clean, intentional visual systems and prototypes.",
-  },
-  Tools: {
-    icon: Wrench,
-    blurb:
-      "The workflow that ships reliably — version control, deploys and delivery.",
-  },
-};
+function iconFor(name: string) {
+  const n = name.toLowerCase();
+  if (n.includes("front")) return Layers;
+  if (n.includes("back") || n.includes("server") || n.includes("data")) return Server;
+  if (n.includes("design") || n.includes("ui")) return PenTool;
+  if (n.includes("tool") || n.includes("ops")) return Wrench;
+  if (n.includes("ai") || n.includes("ml") || n.includes("vision")) return Cpu;
+  return Box;
+}
 
-export function Skills() {
+function Marquee({ groups }: { groups: SkillGroup[] }) {
+  const all = groups.flatMap((g) => g.skills);
+  if (all.length === 0) return null;
+  const loop = [...all, ...all];
+  return (
+    <div className="mask-fade-x relative mt-10 overflow-hidden border-y border-fg/10 py-5" aria-hidden>
+      <div className="flex w-max animate-marquee items-center gap-10 hover:[animation-play-state:paused]">
+        {loop.map((s, i) => (
+          <span key={`${s.name}-${i}`} className="group/skill flex items-center gap-10">
+            <span className="flex items-center gap-3 text-lg font-medium tracking-tight text-subtle transition-colors group-hover/skill:text-fg md:text-xl">
+              <SkillIcon slug={s.slug} name={s.name} className="h-5 w-5" />
+              {s.name}
+            </span>
+            <span className="text-accent/70">+</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function Skills({ index, groups }: { index: string; groups: SkillGroup[] }) {
+  const odd = groups.length % 2 === 1;
   return (
     <section id="skills" className="relative px-6 py-28 md:px-12 md:py-36">
       <div className="mx-auto max-w-7xl">
-        <SectionLabel index="03" title="Capabilities" meta="The stack" />
-        <h2 className="mt-6 text-section-title font-display font-medium text-white">
-          The tools I{" "}
-          <span className="font-serif font-light italic">think</span> in.
-        </h2>
-        <p className="mt-5 max-w-md font-light leading-relaxed text-ash-400">
-          A curated stack I reach for to ship fast, expressive products —
-          grouped by where it lives in the build.
-        </p>
+        <SectionHeader
+          index={index}
+          label="Capabilities"
+          meta="The stack"
+          title="_The tools I_ think in."
+        >
+          <p className="mt-6 max-w-md leading-relaxed text-muted">
+            A curated stack I reach for to ship fast, expressive products — grouped by where it lives
+            in the build.
+          </p>
+        </SectionHeader>
 
-        <div className="mt-14 grid gap-5 md:grid-cols-2">
-          {skillCategories.map((category, ci) => {
-            const { icon: Icon, blurb } = CATEGORY_META[category];
-            const items = skills.filter((s) => s.category === category);
-            return (
-              <motion.div
-                key={category}
-                initial={{ opacity: 0, y: 28 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.7, delay: ci * 0.08, ease: EASE }}
-                data-cursor="hover"
-                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-7 transition-colors duration-500 hover:border-iris-500/40 md:p-9"
-              >
-                {/* corner glow on hover */}
-                <div className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full bg-iris-500/0 blur-3xl transition-all duration-500 group-hover:bg-iris-500/10" />
+        <div className="relative mt-16 border border-fg/10">
+          <Crosshairs />
+          <div className="grid gap-px bg-fg/10 md:grid-cols-2">
+            {groups.map((group, gi) => {
+              const Icon = iconFor(group.name);
+              return (
+                <motion.div
+                  key={group.id}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  transition={{ duration: 0.8, delay: (gi % 2) * 0.1, ease: EASE }}
+                  className={cn(
+                    "group relative overflow-hidden bg-canvas p-7 md:p-10",
+                    odd && gi === groups.length - 1 && "md:col-span-2",
+                  )}
+                >
+                  {/* top edge sweep */}
+                  <span className="absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-accent transition-transform duration-700 ease-out-expo group-hover:scale-x-100" />
+                  <span className="text-outline pointer-events-none absolute right-6 top-4 select-none text-7xl font-bold leading-none tracking-tighter md:text-8xl">
+                    {String(gi + 1).padStart(2, "0")}
+                  </span>
 
-                {/* giant ghost numeral */}
-                <span className="ghost-number absolute right-5 top-1 select-none text-7xl md:text-8xl">
-                  {String(ci + 1).padStart(2, "0")}
-                </span>
-
-                {/* icon tile */}
-                <div className="relative flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-iris-300 transition-colors duration-500 group-hover:border-iris-500/40">
-                  <Icon size={20} strokeWidth={1.6} />
-                </div>
-
-                <h3 className="relative mt-6 font-display text-2xl font-semibold text-white md:text-3xl">
-                  {category}
-                </h3>
-                <p className="relative mt-3 max-w-sm text-sm font-light leading-relaxed text-ash-400">
-                  {blurb}
-                </p>
-
-                <div className="relative mt-7 h-px w-full bg-white/5" />
-
-                <div className="relative mt-6 flex flex-wrap gap-2.5">
-                  {items.map((s) => (
-                    <span key={s.name} className="tag group/skill">
-                      <SkillIcon
-                        slug={s.slug}
-                        name={s.name}
-                        className="h-3.5 w-3.5"
-                      />
-                      {s.name}
-                    </span>
-                  ))}
-                </div>
-
-                <ArrowUpRight
-                  size={18}
-                  className="relative mt-7 text-ash-600 transition-all duration-500 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-iris-300"
-                />
-              </motion.div>
-            );
-          })}
+                  <div className="relative flex h-11 w-11 items-center justify-center border border-fg/10 text-accent transition-colors duration-500 group-hover:border-accent">
+                    <Icon size={18} strokeWidth={1.6} />
+                  </div>
+                  <h3 className="relative mt-7 text-2xl font-medium tracking-tight md:text-3xl">{group.name}</h3>
+                  {group.blurb ? (
+                    <p className="relative mt-3 max-w-sm text-sm leading-relaxed text-muted">{group.blurb}</p>
+                  ) : null}
+                  <div className="relative mt-7 h-px w-full bg-fg/10" />
+                  <ul className="relative mt-6 flex flex-wrap gap-2">
+                    {group.skills.map((s) => (
+                      <li key={s.name} className="chip group/skill hover:border-accent/50 hover:text-fg">
+                        <SkillIcon slug={s.slug} name={s.name} className="h-3.5 w-3.5" />
+                        {s.name}
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
+
+        <Marquee groups={groups} />
       </div>
     </section>
   );

@@ -1,26 +1,38 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import Lenis from "lenis";
 
 const LenisContext = createContext<Lenis | null>(null);
 
-/** Access the active Lenis instance (for programmatic scroll, e.g. nav links). */
+/** Access the active Lenis instance. */
 export const useLenis = () => useContext(LenisContext);
 
-/**
- * Wraps the app with Lenis for the ultra-smooth, weighted scroll feel
- * referenced from linear.app. Drives framer-motion's useScroll via the
- * native scroll position, so all scroll-linked animations stay in sync.
- */
+/** Smooth-scroll to a selector (e.g. "#work") or a y offset, with fallbacks. */
+export function useScrollTo() {
+  const lenis = useLenis();
+  return useCallback(
+    (target: string | number) => {
+      if (typeof target === "number") {
+        if (lenis) lenis.scrollTo(target, { duration: 1.4 });
+        else window.scrollTo({ top: target, behavior: "smooth" });
+        return;
+      }
+      const el = document.querySelector(target) as HTMLElement | null;
+      if (!el) return;
+      if (lenis) lenis.scrollTo(el, { offset: -24, duration: 1.3 });
+      else el.scrollIntoView({ behavior: "smooth", block: "start" });
+    },
+    [lenis],
+  );
+}
+
+/** Weighted, ultra-smooth scrolling (disabled for reduced-motion users). */
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   const [lenis, setLenis] = useState<Lenis | null>(null);
 
   useEffect(() => {
-    const prefersReduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    if (prefersReduced) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const instance = new Lenis({
       duration: 1.15,
@@ -45,7 +57,5 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  return (
-    <LenisContext.Provider value={lenis}>{children}</LenisContext.Provider>
-  );
+  return <LenisContext.Provider value={lenis}>{children}</LenisContext.Provider>;
 }

@@ -1,197 +1,149 @@
 "use client";
 
-import { Reveal } from "@/components/ui/Reveal";
-import { SectionLabel } from "@/components/ui/SectionLabel";
+import { motion } from "framer-motion";
+import { Crosshairs } from "@/components/ui/Crosshairs";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { Scramble } from "@/components/ui/Scramble";
+import type { Principle } from "@/lib/content/schema";
+import { cn } from "@/lib/utils";
 
-/* Isometric rhombus (the flat "top" face of an iso shape). */
-const rhombus = (cx: number, cy: number, w: number) => {
-  const h = w / 2;
-  return `${cx},${cy - h} ${cx + w},${cy} ${cx},${cy + h} ${cx - w},${cy}`;
-};
+const EASE = [0.16, 1, 0.3, 1] as const;
 
-/** FIG 0.1 — stacked isometric plates with a disc accent (built to last). */
+const draw = (i: number) => ({
+  initial: { pathLength: 0, opacity: 0 },
+  whileInView: { pathLength: 1, opacity: 1 },
+  viewport: { once: true, margin: "-60px" },
+  transition: { duration: 1.6, delay: 0.2 + i * 0.07, ease: EASE },
+});
+
+const rhombus = (cx: number, cy: number, w: number) =>
+  `M${cx},${cy - w / 2} L${cx + w},${cy} L${cx},${cy + w / 2} L${cx - w},${cy} Z`;
+
+/** FIG — stacked isometric plates (foundation). */
 function FigLayers() {
-  const cx = 100;
-  const w = 60;
-  const h = w / 2;
-  const ys = [54, 80, 106, 132];
+  const ys = [60, 84, 108, 132];
   return (
     <svg viewBox="0 0 200 180" fill="none" className="h-full w-full">
-      <line
-        x1={cx - w}
-        y1={ys[0]}
-        x2={cx - w}
-        y2={ys[ys.length - 1]}
-        stroke="currentColor"
-        strokeWidth="1"
-        opacity="0.35"
-      />
-      <line
-        x1={cx + w}
-        y1={ys[0]}
-        x2={cx + w}
-        y2={ys[ys.length - 1]}
-        stroke="currentColor"
-        strokeWidth="1"
-        opacity="0.35"
-      />
-      <line
-        x1={cx}
-        y1={ys[0] + h}
-        x2={cx}
-        y2={ys[ys.length - 1] + h}
-        stroke="currentColor"
-        strokeWidth="1"
-        opacity="0.2"
-      />
       {ys.map((cy, i) => (
-        <polygon
-          key={cy}
-          points={rhombus(cx, cy, w)}
-          stroke="currentColor"
-          strokeWidth="1"
-          opacity={0.3 + i * 0.14}
-        />
+        <motion.path key={cy} d={rhombus(100, cy, 62)} stroke="currentColor" strokeWidth="1" {...draw(i)} />
       ))}
-      <ellipse
-        cx={cx}
-        cy={ys[0]}
-        rx={w * 0.46}
-        ry={w * 0.23}
-        stroke="currentColor"
-        strokeWidth="1"
-        opacity="0.6"
-      />
-      <ellipse
-        cx={cx}
-        cy={ys[0]}
-        rx={w * 0.22}
-        ry={w * 0.11}
-        stroke="currentColor"
-        strokeWidth="1"
-        opacity="0.4"
-      />
+      <motion.path d="M38,60 L38,132 M162,60 L162,132 M100,91 L100,163" stroke="currentColor" strokeWidth="1" {...draw(5)} />
+      <motion.ellipse cx="100" cy="60" rx="28" ry="14" stroke="currentColor" strokeWidth="1" {...draw(6)} />
     </svg>
   );
 }
 
-/** A single isometric cube (top + two side faces) with a node dot. */
-function Cube({
-  cx,
-  cy,
-  w,
-  ht,
-  o,
-}: {
-  cx: number;
-  cy: number;
-  w: number;
-  ht: number;
-  o: number;
-}) {
-  const h = w / 2;
-  const left = `${cx - w},${cy} ${cx},${cy + h} ${cx},${cy + h + ht} ${cx - w},${cy + ht}`;
-  const right = `${cx + w},${cy} ${cx},${cy + h} ${cx},${cy + h + ht} ${cx + w},${cy + ht}`;
-  return (
-    <g stroke="currentColor" strokeWidth="1" fill="none">
-      <polygon points={rhombus(cx, cy, w)} opacity={o} />
-      <polygon points={left} opacity={o * 0.65} />
-      <polygon points={right} opacity={o * 0.45} />
-      <circle cx={cx} cy={cy - 1} r="2.4" fill="currentColor" stroke="none" opacity={o} />
-    </g>
-  );
-}
-
-/** FIG 0.2 — cluster of isometric cubes (composed with intent). */
+/** FIG — isometric cube cluster (intent). */
 function FigCubes() {
+  const cube = (cx: number, cy: number, w: number) => {
+    const h = w / 2;
+    return [
+      rhombus(cx, cy, w),
+      `M${cx - w},${cy} L${cx - w},${cy + w} L${cx},${cy + h + w} L${cx},${cy + h}`,
+      `M${cx + w},${cy} L${cx + w},${cy + w} L${cx},${cy + h + w}`,
+    ];
+  };
+  const paths = [...cube(104, 44, 30), ...cube(70, 92, 26), ...cube(134, 98, 22)];
   return (
     <svg viewBox="0 0 200 180" fill="none" className="h-full w-full">
-      <Cube cx={104} cy={46} w={30} ht={30} o={0.55} />
-      <Cube cx={72} cy={92} w={26} ht={26} o={0.46} />
-      <Cube cx={130} cy={98} w={22} ht={22} o={0.38} />
+      {paths.map((d, i) => (
+        <motion.path key={i} d={d} stroke="currentColor" strokeWidth="1" {...draw(i)} />
+      ))}
     </svg>
   );
 }
 
-/** FIG 0.3 — arch of isometric fins (built for speed / velocity). */
+/** FIG — arch of fins (momentum). */
 function FigFins() {
-  const fins = Array.from({ length: 11 }, (_, i) => i);
-  const d = 12;
   return (
     <svg viewBox="0 0 220 180" fill="none" className="h-full w-full">
-      {fins.map((i) => {
+      {Array.from({ length: 11 }, (_, i) => {
         const bx = 30 + i * 13;
         const by = 150 - i * 6;
         const ht = 18 + Math.sin((i / 10) * Math.PI) * 78;
-        const pts = `${bx},${by} ${bx + d},${by - d / 2} ${bx + d},${by - d / 2 - ht} ${bx},${by - ht}`;
-        return (
-          <polygon
-            key={i}
-            points={pts}
-            stroke="currentColor"
-            strokeWidth="1"
-            opacity={0.25 + (i / 10) * 0.45}
-          />
-        );
+        const d = `M${bx},${by} L${bx + 12},${by - 6} L${bx + 12},${by - 6 - ht} L${bx},${by - ht} Z`;
+        return <motion.path key={i} d={d} stroke="currentColor" strokeWidth="1" {...draw(i)} />;
       })}
     </svg>
   );
 }
 
-const FIGURES = [
-  {
-    fig: "FIG 0.1",
-    title: "Engineered to last",
-    body: "Clean, typed foundations and tested architecture — so the work keeps scaling long after launch day.",
-    Svg: FigLayers,
-  },
-  {
-    fig: "FIG 0.2",
-    title: "Designed with intent",
-    body: "Structure, hierarchy and motion composed as one deliberate system — never decoration for its own sake.",
-    Svg: FigCubes,
-  },
-  {
-    fig: "FIG 0.3",
-    title: "Built for speed",
-    body: "Performance is a feature: fast loads, fluid interaction and real momentum on every device.",
-    Svg: FigFins,
-  },
-] as const;
+const FIGURES = [FigLayers, FigCubes, FigFins];
 
-export function Approach() {
+export function Approach({ index, principles }: { index: string; principles: Principle[] }) {
+  const count = principles.length;
+  const highlight = count >= 2 ? 1 : -1;
+  const cols =
+    count >= 4 ? "md:grid-cols-2 xl:grid-cols-4" : count === 3 ? "md:grid-cols-3" : count === 2 ? "md:grid-cols-2" : "";
+
   return (
     <section id="approach" className="relative px-6 py-28 md:px-12 md:py-36">
       <div className="mx-auto max-w-7xl">
-        <Reveal>
-          <SectionLabel index="02" title="Approach" meta="How I build" />
-        </Reveal>
-        <Reveal delay={0.05}>
-          <h2 className="mt-8 max-w-3xl text-section-title font-display font-medium text-white">
-            Principles I{" "}
-            <span className="font-serif font-light italic">build</span> by.
-          </h2>
-        </Reveal>
+        <SectionHeader
+          index={index}
+          label="Approach"
+          meta="How I build"
+          title="_Different products, different stacks —_ the same principles."
+        />
 
-        <div className="mt-16 grid gap-14 md:grid-cols-3 md:gap-8">
-          {FIGURES.map((f, i) => (
-            <Reveal key={f.title} delay={0.1 + i * 0.1}>
-              <div className="group">
-                <div className="mb-4 font-mono text-[0.7rem] uppercase tracking-[0.32em] text-ash-600">
-                  {f.fig}
-                </div>
-                <div className="relative h-52 w-full text-iris-400/75 transition-colors duration-500 group-hover:text-iris-300">
-                  <f.Svg />
-                </div>
-                <h3 className="mt-6 font-display text-xl font-semibold text-white">
-                  {f.title}
-                </h3>
-                <p className="mt-3 max-w-xs text-sm font-light leading-relaxed text-ash-400">
-                  {f.body}
-                </p>
-              </div>
-            </Reveal>
-          ))}
+        <div className="relative mt-16 border border-fg/10">
+          <Crosshairs />
+          <div className={cn("grid divide-y divide-fg/10 md:divide-y-0", cols, count > 1 && "md:divide-x")}>
+            {principles.map((p, i) => {
+              const Fig = FIGURES[i % FIGURES.length];
+              const hot = i === highlight;
+              return (
+                <motion.article
+                  key={`${p.label}-${i}`}
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  transition={{ duration: 0.9, delay: i * 0.12, ease: EASE }}
+                  className={cn(
+                    "group relative flex min-h-[22rem] flex-col justify-between overflow-hidden p-8 md:min-h-[26rem] md:p-9",
+                    hot ? "bg-accent text-accent-fg" : "bg-surface/60",
+                  )}
+                >
+                  {/* line-art watermark */}
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute right-4 top-[54%] h-40 w-40 -translate-y-1/2 md:h-48 md:w-48"
+                  >
+                    <div
+                      className={cn(
+                        "h-full w-full transition-transform duration-700 ease-out-expo group-hover:-translate-y-2 group-hover:scale-105",
+                        hot ? "text-accent-fg/30" : "text-fg/25",
+                      )}
+                    >
+                      <Fig />
+                    </div>
+                  </div>
+
+                  <div className="relative">
+                    <span className={cn("label", hot && "text-accent-fg/75")}>
+                      <Scramble text={p.label} delay={i * 120} />
+                    </span>
+                    <h3
+                      className={cn(
+                        "mt-6 max-w-[15ch] text-[1.65rem] font-medium leading-[1.12] tracking-tight md:text-[1.9rem]",
+                        hot ? "text-accent-fg" : "text-fg",
+                      )}
+                    >
+                      {p.title}
+                    </h3>
+                  </div>
+                  <p
+                    className={cn(
+                      "relative mt-10 max-w-[30ch] text-sm leading-relaxed",
+                      hot ? "text-accent-fg/80" : "text-muted",
+                    )}
+                  >
+                    {p.body}
+                  </p>
+                </motion.article>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>

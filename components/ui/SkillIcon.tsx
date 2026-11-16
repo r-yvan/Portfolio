@@ -4,9 +4,10 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Renders a tech logo from simpleicons.org as a crisp monochrome SVG: grey at
- * rest, white on hover (parent must set the `group/skill` class). Falls back to
- * a monogram tile if the icon slug is unavailable.
+ * Tech logo from simpleicons.org: neutral grey at rest, red on hover
+ * (parent needs `group/skill`). Grey and red read well on both themes, so a
+ * single pair of images covers dark and light mode. Falls back to a sharp
+ * monogram when the slug is empty or the icon no longer exists.
  */
 export function SkillIcon({
   slug,
@@ -19,35 +20,37 @@ export function SkillIcon({
 }) {
   const [failed, setFailed] = useState(false);
 
-  if (failed) {
+  if (!slug || failed) {
     return (
-      <div
+      <span
+        aria-hidden
         className={cn(
-          "flex items-center justify-center rounded-md bg-white/5 font-display text-sm font-bold text-ash-400",
+          "inline-flex items-center justify-center border border-current text-[0.5rem] font-bold leading-none text-subtle transition-colors group-hover/skill:text-accent",
           className,
         )}
       >
-        {name.charAt(0)}
-      </div>
+        {name.charAt(0).toUpperCase()}
+      </span>
     );
   }
 
   return (
-    <span className={cn("relative inline-block", className)}>
+    <span className={cn("relative inline-block", className)} aria-hidden>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={`https://cdn.simpleicons.org/${slug}/6b6b6b`}
-        alt={name}
+        src={`https://cdn.simpleicons.org/${slug}/8a8a8a`}
+        alt=""
         loading="lazy"
+        decoding="async"
         onError={() => setFailed(true)}
         className="h-full w-full object-contain transition-opacity duration-300 group-hover/skill:opacity-0"
       />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={`https://cdn.simpleicons.org/${slug}/f8f8f8`}
+        src={`https://cdn.simpleicons.org/${slug}/ff3b3b`}
         alt=""
-        aria-hidden
         loading="lazy"
+        decoding="async"
         className="absolute inset-0 h-full w-full object-contain opacity-0 transition-opacity duration-300 group-hover/skill:opacity-100"
       />
     </span>
